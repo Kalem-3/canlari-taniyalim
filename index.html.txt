@@ -1,0 +1,706 @@
+!DOCTYPE html
+html lang=tr
+head
+  meta charset=UTF-8 
+  meta name=viewport content=width=device-width, initial-scale=1.0 
+  titleCanları Tanıyalımtitle
+  style
+    root {
+      --bg-1 #050729;
+      --bg-2 #090f3f;
+      --card rgba(10, 18, 72, 0.92);
+      --gold #f3c969;
+      --gold-2 #b8862b;
+      --white #f8fafc;
+      --muted #b9c1d9;
+      --correct #20b36b;
+      --wrong #c0392b;
+      --option #111b5e;
+      --option-border #5364c9;
+    }
+
+     {
+      box-sizing border-box;
+    }
+
+    body {
+      margin 0;
+      min-height 100vh;
+      font-family Arial, Helvetica, sans-serif;
+      background
+        radial-gradient(circle at top, rgba(52, 74, 173, 0.45), transparent 35%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      color var(--white);
+      display flex;
+      align-items center;
+      justify-content center;
+      padding 18px;
+    }
+
+    .app {
+      width min(980px, 100%);
+    }
+
+    .header {
+      text-align center;
+      margin-bottom 18px;
+    }
+
+    .title {
+      display inline-block;
+      padding 12px 26px;
+      border 2px solid var(--gold);
+      border-radius 999px;
+      color var(--gold);
+      background rgba(0, 0, 0, 0.25);
+      letter-spacing 0.5px;
+      font-size clamp(22px, 4vw, 36px);
+      font-weight 800;
+      box-shadow 0 0 22px rgba(243, 201, 105, 0.22);
+    }
+
+    .subtitle {
+      margin 12px auto 0;
+      max-width 720px;
+      color var(--muted);
+      line-height 1.45;
+      font-size 15px;
+    }
+
+    .panel {
+      background var(--card);
+      border 1px solid rgba(243, 201, 105, 0.35);
+      border-radius 28px;
+      padding clamp(18px, 4vw, 34px);
+      box-shadow 0 28px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .top-bar {
+      display flex;
+      justify-content space-between;
+      gap 12px;
+      align-items center;
+      margin-bottom 20px;
+      color var(--muted);
+      font-size 15px;
+      flex-wrap wrap;
+    }
+
+    .score-pill {
+      border 1px solid rgba(243, 201, 105, 0.45);
+      border-radius 999px;
+      padding 9px 14px;
+      color var(--gold);
+      background rgba(0, 0, 0, 0.22);
+      font-weight 700;
+    }
+
+    .question-area {
+      display grid;
+      grid-template-columns 320px 1fr;
+      gap 26px;
+      align-items center;
+    }
+
+    .photo-wrap {
+      width 100%;
+      aspect-ratio 1  1;
+      border-radius 24px;
+      overflow hidden;
+      border 3px solid var(--gold);
+      background rgba(255, 255, 255, 0.08);
+      display flex;
+      align-items center;
+      justify-content center;
+    }
+
+    .photo-wrap img {
+      width 100%;
+      height 100%;
+      object-fit cover;
+      display block;
+    }
+
+    .photo-error {
+      padding 18px;
+      text-align center;
+      color var(--muted);
+      line-height 1.45;
+    }
+
+    .question-box {
+      border 2px solid var(--gold);
+      border-radius 18px;
+      padding 18px 20px;
+      background linear-gradient(180deg, rgba(16, 27, 103, 0.96), rgba(7, 12, 55, 0.96));
+      font-size clamp(20px, 3vw, 28px);
+      font-weight 800;
+      text-align center;
+      line-height 1.3;
+      margin-bottom 20px;
+    }
+
+    .options {
+      display grid;
+      grid-template-columns 1fr 1fr;
+      gap 14px;
+    }
+
+    .option-btn {
+      min-height 58px;
+      border 2px solid var(--option-border);
+      border-radius 999px;
+      background linear-gradient(180deg, #172476, var(--option));
+      color var(--white);
+      cursor pointer;
+      font-size 17px;
+      font-weight 700;
+      padding 12px 16px;
+      transition transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .option-btnhovernot(disabled) {
+      transform translateY(-2px);
+      border-color var(--gold);
+    }
+
+    .option-btndisabled {
+      cursor default;
+      opacity 0.95;
+    }
+
+    .option-btn.correct {
+      background linear-gradient(180deg, #25c978, var(--correct));
+      border-color #8af0bd;
+    }
+
+    .option-btn.wrong {
+      background linear-gradient(180deg, #db4d3d, var(--wrong));
+      border-color #ffaaa1;
+    }
+
+    .feedback {
+      min-height 28px;
+      margin-top 18px;
+      text-align center;
+      color var(--gold);
+      font-weight 800;
+      font-size 18px;
+    }
+
+    .actions {
+      display flex;
+      gap 12px;
+      justify-content center;
+      margin-top 18px;
+      flex-wrap wrap;
+    }
+
+    .main-btn {
+      border 0;
+      border-radius 999px;
+      padding 13px 22px;
+      font-weight 800;
+      cursor pointer;
+      background linear-gradient(180deg, var(--gold), var(--gold-2));
+      color #07103f;
+      font-size 16px;
+      box-shadow 0 10px 24px rgba(0, 0, 0, 0.24);
+    }
+
+    .secondary-btn {
+      border 1px solid rgba(243, 201, 105, 0.55);
+      border-radius 999px;
+      padding 13px 22px;
+      font-weight 800;
+      cursor pointer;
+      background rgba(0, 0, 0, 0.22);
+      color var(--gold);
+      font-size 16px;
+    }
+
+    .hidden {
+      display none !important;
+    }
+
+    .empty-state {
+      text-align center;
+      line-height 1.6;
+      color var(--muted);
+      max-width 760px;
+      margin 0 auto;
+    }
+
+    .empty-state h2 {
+      color var(--gold);
+      font-size clamp(24px, 4vw, 38px);
+      margin-bottom 12px;
+    }
+
+    .result-number {
+      color var(--gold);
+      font-weight 900;
+    }
+
+    code {
+      color var(--gold);
+    }
+
+    @media (max-width 760px) {
+      .question-area {
+        grid-template-columns 1fr;
+      }
+
+      .photo-wrap {
+        max-width 330px;
+        margin 0 auto;
+      }
+
+      .options {
+        grid-template-columns 1fr;
+      }
+    }
+  style
+head
+body
+  main class=app
+    header class=header
+      div class=titleCanları Tanıyalımdiv
+      p class=subtitle
+        Bu alan, topluluğumuzdaki Canların isimlerini fotoğraflar üzerinden daha kolay hatırlamak için hazırlanmıştır.
+      p
+    header
+
+    section class=panel id=gamePanel
+      div id=emptyState class=empty-state hidden
+        h2Henüz katılımcı eklenmemiş.h2
+        p
+          Aşağıdaki codeparticipantscode listesine isim, fotoğraf dosya adı ve cinsiyet bilgilerini ekleyin.
+        p
+      div
+
+      div id=gameContent
+        div class=top-bar
+          div id=progressTextSoru 1  1div
+          div class=score-pill id=scoreTextDoğru 0div
+        div
+
+        div class=question-area
+          div class=photo-wrap id=photoWrap
+            img id=personPhoto src= alt=Soru fotoğrafı 
+          div
+
+          div
+            div class=question-boxBu kişi kimdiv
+            div class=options id=optionsdiv
+            div class=feedback id=feedbackdiv
+            div class=actions
+              button class=main-btn hidden id=nextBtnSonraki Canbutton
+              button class=secondary-btn id=restartBtnBaştan Başlabutton
+            div
+          div
+        div
+      div
+    section
+  main
+
+  script
+    
+      FOTOĞRAF EKLEME MANTIĞI
+      1) index.html ile aynı klasöre photos adlı bir klasör açın.
+      2) Fotoğrafları bu klasöre koyun.
+      3) Aşağıdaki listeye her kişi için şu formatta satır ekleyin
+         { name Ad Soyad, photo Ad Soyad.jpg, gender E }
+         { name Ad Soyad, photo Ad Soyad.jpg, gender K }
+
+      gender alanı
+      E = Erkek
+      K = Kadın
+
+      Not Fotoğraf adının kişi adıyla birebir aynı olması gerekir. Uzantı karışıksa sorun değil; sistem .jpg, .jpeg, .JPG, .JPEG, .Jpg ve .Jpeg uzantılarını sırayla dener.
+    
+
+    const rawParticipants = [
+      { name Ali Sultan Ali Yağız, gender E },
+      { name Nur Ana Aynur Yağız, gender K },
+      { name Sultan Ana Özlem Yağız, gender K },
+      { name Gülderen Sultan Gülhanım Polat, gender K },
+      { name Serferaz Sultan Selma Koruk, gender K },
+      { name Aşık İsmail Sultan Esat Kılıç, gender E },
+      { name Erbabi Sultan Çağlar Polat, gender E },
+      { name Teslimi Sultan Mevsim Koruk, gender K },
+      { name Aseli Sultan Zeliha Kızılkaya, gender K },
+      { name Figeni Sultan Zehra Kılıç, gender K },
+      { name İkrari Sultan Ayhan Polat, gender E },
+      { name Ali Ant, gender E },
+      { name Aslı Ecem Akbulut, gender K },
+      { name Berna Kızılkaya, gender K },
+      { name Betül Şahhüseyinoğlu, gender K },
+      { name Binnur Şimşek, gender K },
+      { name Birol Özer, gender E },
+      { name Buğra Kaplan, gender E },
+      { name Bülent Yağız, gender E },
+      { name Çeşminaz Yağız, gender K },
+      { name Çiğdem Çakır Çelik, gender K },
+      { name Defne Kılıç, gender K },
+      { name Demet Kaplan, gender K },
+      { name Deniz Mahmut Çelik, gender E },
+      { name Dilek Ata, gender K },
+      { name Döndü Akbulut, gender K },
+      { name Ebru Kuttayı, gender K },
+      { name Elif Can, gender K },
+      { name Elif Bağtaş, gender K },
+      { name Emin Ata, gender E },
+      { name Emir Kılıç, gender E },
+      { name Engin Karaca, gender E },
+      { name Erdoğan Kaplan, gender E },
+      { name Erdoğan Kılıç, gender E },
+      { name Eren Polat, gender E },
+      { name Filiz Kaplan, gender K },
+      { name Filiz Ant, gender K },
+      { name Gamze Yağız, gender K },
+      { name Hakan Bağtaş, gender E },
+      { name Hasan Şimşek, gender E },
+      { name Hüseyin Ören, gender E },
+      { name Irmak Demir, gender K },
+      { name Leyla Polat, gender K },
+      { name Lorin Yağız, gender K },
+      { name Mehtap Diktepe, gender K },
+      { name Melda Tuzluca, gender K },
+      { name Melek Buse Bağcı, gender K },
+      { name Meliha Kılıç, gender K },
+      { name Melisa Bağcı, gender K },
+      { name Meltem Kılıç, gender K },
+      { name Meral Bağcı, gender K },
+      { name Merve Aksakallı, gender K },
+      { name Müslim Akil Akbulut, gender E },
+      { name Neriman Gülen, gender K },
+      { name Neslihan Polat, gender K },
+      { name Nihat Bağcı, gender E },
+      { name Nurettin Karaca, gender E },
+      { name Pınar Demir, gender K },
+      { name Satu Şimşek, gender K },
+      { name Seda Karaca, gender K },
+      { name Sehel Polat, gender K },
+      { name Selin Deniz, gender K },
+      { name Serkan Akbulut, gender E },
+      { name Seyit Ali Bağcı, gender E },
+      { name Seyit Kılıç, gender E },
+      { name Sultan Elçi, gender K },
+      { name Şehriban Özer, gender K },
+      { name Volkan Diktepe, gender E },
+      { name Yavuz Polat, gender E },
+      { name Yazgülü Polat, gender K },
+      { name Yeter Kılıç, gender K },
+      { name Yıldız Yiğit, gender K },
+      { name Yurdagül Polat, gender K },
+      { name Zeliha Yiğit, gender K }
+    ];
+
+    const participants = rawParticipants.map(person = ({
+      ...person,
+      photoBase person.name
+    }));
+
+    const imageExtensions = [.jpg, .jpeg, .JPG, .JPEG, .Jpg, .Jpeg];
+
+    const state = {
+      phase first,
+      order [],
+      currentIndex 0,
+      firstRoundCorrect 0,
+      retryRoundCorrect 0,
+      wrongAnswers [],
+      answered false,
+      currentPerson null
+    };
+
+    const emptyState = document.getElementById(emptyState);
+    const gameContent = document.getElementById(gameContent);
+    const progressText = document.getElementById(progressText);
+    const scoreText = document.getElementById(scoreText);
+    const photoWrap = document.getElementById(photoWrap);
+    const optionsEl = document.getElementById(options);
+    const feedback = document.getElementById(feedback);
+    const nextBtn = document.getElementById(nextBtn);
+    const restartBtn = document.getElementById(restartBtn);
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i  0; i--) {
+        const j = Math.floor(Math.random()  (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function photoPath(fileName) {
+      return photos + encodeURIComponent(fileName).replace(%2Fg, );
+    }
+
+    function getPhotoCandidates(person) {
+      if (person.photo) {
+        return [person.photo];
+      }
+
+      return imageExtensions.map(extension = `${person.photoBase}${extension}`);
+    }
+
+    function loadPersonPhoto(img, person) {
+      const candidates = getPhotoCandidates(person);
+      let candidateIndex = 0;
+
+      function tryNextPhoto() {
+        if (candidateIndex = candidates.length) {
+          window.photoWrap.innerHTML = `
+            div class=photo-error
+              Fotoğraf bulunamadı.br
+              Şu dosya adları denendibr
+              code${candidates.map(fileName = `photos${fileName}`).join(br)}code
+            div
+          `;
+          return;
+        }
+
+        img.src = photoPath(candidates[candidateIndex]);
+        candidateIndex++;
+      }
+
+      img.onerror = tryNextPhoto;
+      tryNextPhoto();
+    }
+
+    function totalCorrect() {
+      return state.firstRoundCorrect + state.retryRoundCorrect;
+    }
+
+    function getChoices(correctPerson) {
+      const sameGenderWrong = participants.filter(person =
+        person.name !== correctPerson.name && person.gender === correctPerson.gender
+      );
+
+      const fallbackWrong = participants.filter(person =
+        person.name !== correctPerson.name && person.gender !== correctPerson.gender
+      );
+
+      const wrongChoices = shuffle([...sameGenderWrong, ...fallbackWrong]).slice(0, 3);
+      return shuffle([correctPerson, ...wrongChoices]);
+    }
+
+    function startGame() {
+      if (!participants.length) {
+        emptyState.classList.remove(hidden);
+        gameContent.classList.add(hidden);
+        return;
+      }
+
+      state.phase = first;
+      state.order = shuffle(participants);
+      state.currentIndex = 0;
+      state.firstRoundCorrect = 0;
+      state.retryRoundCorrect = 0;
+      state.wrongAnswers = [];
+      state.answered = false;
+
+      resetGameContentLayout();
+      renderQuestion();
+    }
+
+    function resetGameContentLayout() {
+      gameContent.innerHTML = `
+        div class=top-bar
+          div id=progressTextSoru 1  1div
+          div class=score-pill id=scoreTextDoğru 0div
+        div
+
+        div class=question-area
+          div class=photo-wrap id=photoWrap
+            img id=personPhoto src= alt=Soru fotoğrafı 
+          div
+
+          div
+            div class=question-boxBu kişi kimdiv
+            div class=options id=optionsdiv
+            div class=feedback id=feedbackdiv
+            div class=actions
+              button class=main-btn hidden id=nextBtnSonraki Canbutton
+              button class=secondary-btn id=restartBtnBaştan Başlabutton
+            div
+          div
+        div
+      `;
+
+      window.progressText = document.getElementById(progressText);
+      window.scoreText = document.getElementById(scoreText);
+      window.photoWrap = document.getElementById(photoWrap);
+      window.optionsEl = document.getElementById(options);
+      window.feedback = document.getElementById(feedback);
+      window.nextBtn = document.getElementById(nextBtn);
+      window.restartBtn = document.getElementById(restartBtn);
+
+      window.nextBtn.addEventListener(click, nextQuestion);
+      window.restartBtn.addEventListener(click, startGame);
+    }
+
+    function renderQuestion() {
+      state.answered = false;
+      window.feedback.textContent = ;
+      window.nextBtn.classList.add(hidden);
+      window.optionsEl.innerHTML = ;
+      window.photoWrap.innerHTML = img id='personPhoto' src='' alt='Soru fotoğrafı' ;
+
+      state.currentPerson = state.order[state.currentIndex];
+      const img = document.getElementById(personPhoto);
+      img.alt = state.currentPerson.name +  fotoğrafı;
+      loadPersonPhoto(img, state.currentPerson);
+
+      const phaseText = state.phase === first  İlk Tur  Yanlışları Tekrar Deneme;
+      window.progressText.textContent = `${phaseText} — Soru ${state.currentIndex + 1}  ${state.order.length}`;
+      window.scoreText.textContent = `Toplam Doğru ${totalCorrect()}`;
+
+      const choices = getChoices(state.currentPerson);
+      choices.forEach((choice, index) = {
+        const btn = document.createElement(button);
+        btn.className = option-btn;
+        btn.textContent = `${String.fromCharCode(65 + index)} ${choice.name}`;
+        btn.dataset.name = choice.name;
+        btn.addEventListener(click, () = answerQuestion(btn, choice));
+        window.optionsEl.appendChild(btn);
+      });
+    }
+
+    function answerQuestion(button, selectedPerson) {
+      if (state.answered) return;
+      state.answered = true;
+
+      const isCorrect = selectedPerson.name === state.currentPerson.name;
+
+      if (isCorrect) {
+        if (state.phase === first) {
+          state.firstRoundCorrect++;
+        } else {
+          state.retryRoundCorrect++;
+        }
+        window.feedback.textContent = `Doğru cevap! Bu Can ${state.currentPerson.name}`;
+        button.classList.add(correct);
+      } else {
+        if (state.phase === first) {
+          state.wrongAnswers.push(state.currentPerson);
+        }
+        window.feedback.textContent = `Yanlış. Doğru cevap ${state.currentPerson.name}`;
+        button.classList.add(wrong);
+      }
+
+      [...window.optionsEl.children].forEach(btn = {
+        btn.disabled = true;
+        if (btn.dataset.name === state.currentPerson.name) {
+          btn.classList.add(correct);
+        }
+      });
+
+      window.scoreText.textContent = `Toplam Doğru ${totalCorrect()}`;
+
+      const isLastQuestion = state.currentIndex === state.order.length - 1;
+      if (isLastQuestion && state.phase === first) {
+        window.nextBtn.textContent = İlk Tur Sonucunu Göster;
+      } else if (isLastQuestion && state.phase === retry) {
+        window.nextBtn.textContent = Final Sonucunu Göster;
+      } else {
+        window.nextBtn.textContent = Sonraki Can;
+      }
+
+      window.nextBtn.classList.remove(hidden);
+    }
+
+    function nextQuestion() {
+      if (state.currentIndex  state.order.length - 1) {
+        state.currentIndex++;
+        renderQuestion();
+        return;
+      }
+
+      if (state.phase === first) {
+        showFirstRoundResult();
+      } else {
+        showFinalResult();
+      }
+    }
+
+    function showFirstRoundResult() {
+      const totalCan = participants.length;
+      const correctCan = state.firstRoundCorrect;
+      const wrongCan = state.wrongAnswers.length;
+
+      if (wrongCan === 0) {
+        gameContent.innerHTML = `
+          div class=empty-state
+            h2Tebrik Ederiz!h2
+            pHer Canı doğru bildiniz.p
+            pToplam span class=result-number${totalCan}span Candan span class=result-number${correctCan}span Canı doğru bildiniz.p
+            div class=actions
+              button class=main-btn onclick=location.reload()Tekrar Başlabutton
+            div
+          div
+        `;
+        return;
+      }
+
+      gameContent.innerHTML = `
+        div class=empty-state
+          h2Tebrikler!h2
+          p
+            Toplam span class=result-number${totalCan}span Candan
+            span class=result-number${correctCan}span Canı doğru bildiniz.
+          p
+          p
+            Şimdi yanlış cevaplarınızı tekrar denemek için
+            strong“Yanlış cevaplarımı bir daha sor”strong tuşuna basın.
+          p
+          div class=actions
+            button class=main-btn id=retryWrongBtnYanlış cevaplarımı bir daha sorbutton
+            button class=secondary-btn onclick=location.reload()Baştan Başlabutton
+          div
+        div
+      `;
+
+      document.getElementById(retryWrongBtn).addEventListener(click, startRetryRound);
+    }
+
+    function startRetryRound() {
+      state.phase = retry;
+      state.order = shuffle(state.wrongAnswers);
+      state.currentIndex = 0;
+      state.answered = false;
+
+      resetGameContentLayout();
+      renderQuestion();
+    }
+
+    function showFinalResult() {
+      const totalCan = participants.length;
+      const firstCorrect = state.firstRoundCorrect;
+      const retryCorrect = state.retryRoundCorrect;
+      const finalCorrect = totalCorrect();
+      const remainingWrong = totalCan - finalCorrect;
+
+      gameContent.innerHTML = `
+        div class=empty-state
+          h2Çalışma Tamamlandı!h2
+          pİlk tur doğru sayınız span class=result-number${firstCorrect}  ${totalCan}spanp
+          pYanlışları tekrar deneme turunda doğru sayınız span class=result-number${retryCorrect}  ${state.wrongAnswers.length}spanp
+          pToplamda span class=result-number${totalCan}span Candan span class=result-number${finalCorrect}span Canı doğru bildiniz.p
+          pKalan yanlış sayısı span class=result-number${remainingWrong}spanp
+          div class=actions
+            button class=main-btn onclick=location.reload()Tekrar Başlabutton
+          div
+        div
+      `;
+    }
+
+    nextBtn.addEventListener(click, nextQuestion);
+    restartBtn.addEventListener(click, startGame);
+
+    startGame();
+  script
+body
+html
